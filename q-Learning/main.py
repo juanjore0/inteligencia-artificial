@@ -6,10 +6,13 @@ from collections import defaultdict
 
 pygame.init()
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 460
 CELL_SIZE = 40
 FPS = 60
+
+MAZE_OFFSET_X = 60
+MAZE_OFFSET_Y = 50
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -25,21 +28,15 @@ pygame.display.set_caption("Ventana")
 clock = pygame.time.Clock()
 
 maze = np.array([
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-    [1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ])
 
 MAZE_ROWS = maze.shape[0]
@@ -64,18 +61,20 @@ class Mouse:
                 self.y = new_y
     
     def draw(self):
-        pygame.draw.circle(screen, GRAY, (self.x + CELL_SIZE // 2, self.y + CELL_SIZE // 2), CELL_SIZE // 3)
+        x = self.x + MAZE_OFFSET_X
+        y = self.y + MAZE_OFFSET_Y
+        pygame.draw.circle(screen, GRAY, (x + CELL_SIZE // 2, y + CELL_SIZE // 2), CELL_SIZE // 3)
         
         ear_offset = CELL_SIZE // 4
-        pygame.draw.circle(screen, GRAY, (self.x + CELL_SIZE // 4, self.y + CELL_SIZE // 4), CELL_SIZE // 6)
-        pygame.draw.circle(screen, GRAY, (self.x + 3 * CELL_SIZE // 4, self.y + CELL_SIZE // 4), CELL_SIZE // 6)
+        pygame.draw.circle(screen, GRAY, (x + CELL_SIZE // 4, y + CELL_SIZE // 4), CELL_SIZE // 6)
+        pygame.draw.circle(screen, GRAY, (x + 3 * CELL_SIZE // 4, y + CELL_SIZE // 4), CELL_SIZE // 6)
         
-        pygame.draw.circle(screen, BLACK, (self.x + CELL_SIZE // 3, self.y + CELL_SIZE // 2), CELL_SIZE // 10)
-        pygame.draw.circle(screen, BLACK, (self.x + 2 * CELL_SIZE // 3, self.y + CELL_SIZE // 2), CELL_SIZE // 10)
+        pygame.draw.circle(screen, BLACK, (x + CELL_SIZE // 3, y + CELL_SIZE // 2), CELL_SIZE // 10)
+        pygame.draw.circle(screen, BLACK, (x + 2 * CELL_SIZE // 3, y + CELL_SIZE // 2), CELL_SIZE // 10)
         
         pygame.draw.line(screen, BLACK, 
-                        (self.x + CELL_SIZE // 2, self.y + 2 * CELL_SIZE // 3),
-                        (self.x + CELL_SIZE // 2 + CELL_SIZE // 3, self.y + 3 * CELL_SIZE // 4), 2)
+                        (x + CELL_SIZE // 2, y + 2 * CELL_SIZE // 3),
+                        (x + CELL_SIZE // 2 + CELL_SIZE // 3, y + 3 * CELL_SIZE // 4), 2)
 
 class Cheese:
     def __init__(self, x, y):
@@ -83,10 +82,12 @@ class Cheese:
         self.y = y
     
     def draw(self):
-        pygame.draw.rect(screen, YELLOW, (self.x + 5, self.y + 5, CELL_SIZE - 10, CELL_SIZE - 10))
-        pygame.draw.circle(screen, BROWN, (self.x + CELL_SIZE // 3, self.y + CELL_SIZE // 3), 3)
-        pygame.draw.circle(screen, BROWN, (self.x + 2 * CELL_SIZE // 3, self.y + CELL_SIZE // 3), 3)
-        pygame.draw.circle(screen, BROWN, (self.x + CELL_SIZE // 2, self.y + 2 * CELL_SIZE // 3), 3)
+        x = self.x + MAZE_OFFSET_X
+        y = self.y + MAZE_OFFSET_Y
+        pygame.draw.rect(screen, YELLOW, (x + 5, y + 5, CELL_SIZE - 10, CELL_SIZE - 10))
+        pygame.draw.circle(screen, BROWN, (x + CELL_SIZE // 3, y + CELL_SIZE // 3), 3)
+        pygame.draw.circle(screen, BROWN, (x + 2 * CELL_SIZE // 3, y + CELL_SIZE // 3), 3)
+        pygame.draw.circle(screen, BROWN, (x + CELL_SIZE // 2, y + 2 * CELL_SIZE // 3), 3)
 
 class QLearning:
     def __init__(self, learning_rate=0.1, discount_factor=0.95, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.01):
@@ -122,11 +123,13 @@ class QLearning:
 def draw_maze():
     for row in range(MAZE_ROWS):
         for col in range(MAZE_COLS):
+            x = col * CELL_SIZE + MAZE_OFFSET_X
+            y = row * CELL_SIZE + MAZE_OFFSET_Y
             if maze[row][col] == 1:
-                pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                pygame.draw.rect(screen, BLACK, (x, y, CELL_SIZE, CELL_SIZE))
             else:
-                pygame.draw.rect(screen, WHITE, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-                pygame.draw.rect(screen, GRAY, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
+                pygame.draw.rect(screen, WHITE, (x, y, CELL_SIZE, CELL_SIZE))
+                pygame.draw.rect(screen, GRAY, (x, y, CELL_SIZE, CELL_SIZE), 1)
 
 def check_collision(mouse, cheese):
     mouse_col = mouse.x // CELL_SIZE
@@ -154,9 +157,9 @@ def show_training_info(episode, total_episodes, epsilon, reward):
     pygame.draw.rect(screen, WHITE, (0, 0, SCREEN_WIDTH, 30))
     screen.blit(text_surface, (10, 5))
 
-def train_qlearning(episodes=500, max_steps=200, visualize=True):
+def train_qlearning(episodes=200, max_steps=50, visualize=True):
     q_agent = QLearning()
-    cheese_pos = (18, 13)
+    cheese_pos = (10, 7)
     
     for episode in range(episodes):
         mouse = Mouse(CELL_SIZE, CELL_SIZE)
@@ -208,12 +211,12 @@ def train_qlearning(episodes=500, max_steps=200, visualize=True):
 
 def run_trained_mouse(q_agent):
     mouse = Mouse(CELL_SIZE, CELL_SIZE)
-    cheese = Cheese(18 * CELL_SIZE, 13 * CELL_SIZE)
+    cheese = Cheese(10 * CELL_SIZE, 7 * CELL_SIZE)
     
     victory = False
     running = True
     steps = 0
-    max_steps = 200
+    max_steps = 100
     
     while running and not victory and steps < max_steps:
         for event in pygame.event.get():
@@ -266,7 +269,7 @@ def run_trained_mouse(q_agent):
 
 def main():
     print("Iniciando entrenamiento del ratón con Q-Learning...")
-    q_agent = train_qlearning(episodes=500, max_steps=200, visualize=True)
+    q_agent = train_qlearning(episodes=200, max_steps=50, visualize=True)
     print("Entrenamiento completado!")
     print("\nAhora el ratón entrenado buscará el queso...")
     
