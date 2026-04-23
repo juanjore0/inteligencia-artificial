@@ -91,6 +91,18 @@ class Cheese:
 
 class QLearning:
     def __init__(self, learning_rate=0.1, discount_factor=0.95, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.01):
+        
+        """
+        Estructura central:
+
+        q_table[state][action] → valor esperado
+
+        Parámetros:
+        α (learning_rate): velocidad de aprendizaje
+        γ (discount_factor): peso del futuro
+        ε (epsilon): probabilidad de exploración
+        """
+        
         self.q_table = defaultdict(lambda: defaultdict(float))
         self.learning_rate = learning_rate
         self.discount_factor = discount_factor
@@ -103,6 +115,21 @@ class QLearning:
         return (mouse.x // CELL_SIZE, mouse.y // CELL_SIZE)
     
     def choose_action(self, state, training=True):
+
+        """
+        Política ε-greedy:
+
+        Exploración:
+            acción aleatoria
+
+        Explotación:
+            acción con mayor valor Q
+
+        Control:
+            ε alto → comportamiento aleatorio
+            ε bajo → comportamiento optimizado
+        """
+
         if training and random.random() < self.epsilon:
             return random.choice(self.actions)
         else:
@@ -158,6 +185,14 @@ def show_training_info(episode, total_episodes, epsilon, reward):
     screen.blit(text_surface, (10, 5))
 
 def train_qlearning(episodes=200, max_steps=50, visualize=True):
+
+    """
+    Bucle de entrenamiento:
+
+    Repetición de episodios independientes.
+    Cada episodio reinicia el entorno.
+    """
+
     q_agent = QLearning()
     cheese_pos = (10, 7)
     
@@ -182,16 +217,18 @@ def train_qlearning(episodes=200, max_steps=50, visualize=True):
             mouse.move(action[0], action[1])
             next_state = q_agent.get_state(mouse)
             
-            reward = -1
+            # Señal de recompensa
+            reward = -1  # penaliza tiempo
+            
             if check_collision(mouse, cheese):
-                reward = 100
+                reward = 100  # objetivo alcanzado
                 done = True
             elif (old_x, old_y) == (mouse.x, mouse.y):
-                reward = -10
+                reward = -10    # castiga choques
             
             q_agent.update_q_value(state, action, reward, next_state)
             total_reward += reward
-            steps += 1
+            steps += 1  
             
             if visualize and episode % 10 == 0:
                 screen.fill(WHITE)
@@ -213,6 +250,10 @@ def run_trained_mouse(q_agent):
     mouse = Mouse(CELL_SIZE, CELL_SIZE)
     cheese = Cheese(10 * CELL_SIZE, 7 * CELL_SIZE)
     
+    """
+    Ejecución sin exploración
+    """
+
     victory = False
     running = True
     steps = 0
